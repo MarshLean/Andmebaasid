@@ -1,13 +1,11 @@
--- SQL Server Management Stuudio
+-- XAMPP CONTROL PANEL (Start Apache, Start MySQL)
 -- Login
 
--- (localdb)\MSSQLLocalDB
+-- connect to localhost
 
---Authentification: Windows Auth - Admini Õigused LocalHostis
+--Authentification: Kasutajanimi - root, parool ei ole
 
---Authentification: SQL Server Auth - Varem Loodud Kasutajad
-
---New Query
+--SQL:
 
 CREATE DATABASE gerskevitsTITpv23;
 --OBJECT EXPLORER ON VAJA PIDEVALT UUENDADA KÄASITI
