@@ -23,7 +23,9 @@ Synicalaeg date,
 Aadress TEXT,
 Opilaskodu bit
 );
-SELECT * FROM Opilane;
+
+--kasutamine seos tabelite vahel - JOIN
+SELECT * FROM Opilane JOIN ryhm ON opilane.ryhmID=ryhm.ryhmID;
 --TABELI KUSTUMINE
 
 DROP table Opilane;
@@ -31,5 +33,44 @@ DROP table Opilane;
 
 INSERT INTO Opilane(Eesnimi, Perenimi, Synicalaeg, Aadress, Opilaskodu)
 VALUES ('Mark', 'Levin', '2000-12-5', 'Tallinn', 1),
-('Andrei', 'Astora', '897-3-6', 'DarkSouls', 0),
+('Andrei', 'Astora', '1897-3-6', 'DarkSouls', 0),
 ('Mati', 'Kask', '2005-11-2', 'Tartu', 0);
+
+-- tabel Ruhm
+CREATE TABLE ryhm(
+ryhmID int not null primary key identity(1,1),
+ryhm varchar(10) unique,
+osakond varchar(20)
+);
+INSERT INTO ryhm(ryhm, osakond)
+Values ('TiTpv24', 'IT'),('KRRpv23','Rätsepp');
+
+Select * from ryhm;
+
+-- lisame uus veerg RyhmID tabelisse opilane
+ALTER TABLE Opilane ADD ryhmID int;
+
+--lisame foreign key
+ALTER TABLE Opilane ADD foreign key (ryhmID) references ryhm(ryhmID)
+
+--foreign key kontroll
+INSERT INTO Opilane(Eesnimi, Perenimi, Synicalaeg, Aadress, Opilaskodu, ryhmID)
+VALUES ('Mark', 'MegaSigma', '2000-12-5', 'Tallinn', 1, 1)
+
+--lihtsaim vaade
+SELECT o.perenimi, r.ryhm, o.aadress FROM Opilane o JOIN ryhm r ON o.ryhmID=r.ryhmID;
+
+--tabel hinne
+CREATE TABLE hinne(
+hinneID INT NOT NULL PRIMARY KEY Identity (1,1),
+OpilaneID INT,
+hinne int,
+opiaine VARCHAR(20),
+);
+
+ALTER TABLE hinne ADD foreign key (opilaneID) references Opilane(OpilaneID);
+
+INSERT INTO hinne(OpilaneID, opiaine, hinne)
+Values (5, 'Arvutivõrgud', 5 ),(9,'Linux', 3 );
+select * from hinne;
+SELECT o.Perenimi, h.hinne FROM Opilane o JOIN hinne h ON o.OpilaneID=h.OpilaneID;
