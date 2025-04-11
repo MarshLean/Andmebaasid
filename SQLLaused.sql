@@ -1,14 +1,3 @@
--- SQL Server Management Stuudio
--- Login
-
--- (localdb)\MSSQLLocalDB
-
---Authentification: Windows Auth - Admini Õigused LocalHostis
-
---Authentification: SQL Server Auth - Varem Loodud Kasutajad
-
---New Query
-
 CREATE DATABASE gerskevitsTITpv23;
 --OBJECT EXPLORER ON VAJA PIDEVALT UUENDADA KÄASITI
 
@@ -28,7 +17,7 @@ Opilaskodu bit
 SELECT * FROM Opilane JOIN ryhm ON opilane.ryhmID=ryhm.ryhmID;
 --TABELI KUSTUMINE
 
-DROP table Opilane;
+DROP table opetaja;
 --ANDMETE LISAMINE TABELISSE
 
 INSERT INTO Opilane(Eesnimi, Perenimi, Synicalaeg, Aadress, Opilaskodu)
@@ -74,3 +63,15 @@ INSERT INTO hinne(OpilaneID, opiaine, hinne)
 Values (5, 'Arvutivõrgud', 5 ),(9,'Linux', 3 );
 select * from hinne;
 SELECT o.Perenimi, h.hinne FROM Opilane o JOIN hinne h ON o.OpilaneID=h.OpilaneID;
+
+CREATE TABLE opetaja(
+OpetajaID INT NOT NULL PRIMARY KEY,
+nimi varchar(20),
+perenimi varchar(20) unique,
+telefon varchar(50)
+);
+
+ALTER TABLE ryhm ADD OpetajaID int;
+ALTER TABLE ryhm ADD foreign key (OpetajaID) references opetaja(OpetajaID)
+INSERT INTO opetaja(nimi, perenimi, telefon)
+VALUES ('Mikhail', 'Agapov', '12497'), ('Nikita', 'Podkopaev', '41774');
