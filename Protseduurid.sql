@@ -55,3 +55,14 @@ EXEC uuendaLinn 0.05;
 DROP PROCEDURE uuendaLinn;
 UPDATE linnad SET elanikeArv=200000 WHERE linnID=2;
 SELECT * FROM linnad;
+
+CREATE PROCEDURE keskmineArv
+AS
+BEGIN
+SELECT AVG(elanikeArv) AS 'Keskmine elanikeArv'
+FROM linnad;
+
+SELECT CAST(AVG(elanikeArv) AS decimal(7,2)) AS 'Keskmine elanikeArv' FROM linnad;
+END
+
+EXEC keskmineArv;
