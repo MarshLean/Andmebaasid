@@ -66,3 +66,44 @@ SELECT CAST(AVG(elanikeArv) AS decimal(7,2)) AS 'Keskmine elanikeArv' FROM linna
 END
 
 EXEC keskmineArv;
+
+--ainult 1 taht
+BEGIN
+SELECT filmNimetus, pikkus
+FROM film
+WHERE filmNimetus LIKE CONCAT(taht, '%');
+END
+
+--ADD
+BEGIN
+set @sqltegevus=concat('ALTER TABLE ', 
+tabelinimi, ' ADD COLUMN ' , veerunimi, ' ', tyyp);
+PREPARE STMT FROM @sqltegevus;
+EXECUTE STMT;
+END
+
+--DROP
+BEGIN
+set @sqltegevus=concat('ALTER TABLE ', 
+tabelinimi, ' DROP COLUMN ' , veerunimi);
+PREPARE STMT FROM @sqltegevus;
+EXECUTE STMT;
+END
+
+
+--GET
+BEGIN
+DECLARE today TIMESTAMP DEFAULT CURRENT_DATE;
+    SELECT today, filmnimetus, pikkus
+    FROM film
+    WHERE pikkus < pikkus_val;
+END
+
+
+--GET BY TYPE
+BEGIN
+SELECT f.filmNimetus, t.filmtype
+FROM film f
+INNER JOIN filmtype t ON f.filmtypeID=t.filmTypeID
+AND t.filmtype= type;
+END
