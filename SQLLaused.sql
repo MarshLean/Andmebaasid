@@ -75,3 +75,44 @@ ALTER TABLE ryhm ADD OpetajaID int;
 ALTER TABLE ryhm ADD foreign key (OpetajaID) references opetaja(OpetajaID)
 INSERT INTO opetaja(nimi, perenimi, telefon)
 VALUES ('Mikhail', 'Agapov', '12497'), ('Nikita', 'Podkopaev', '41774');
+
+CREATE DATABASE kasutajaTIT;
+
+USE kasutajaTIT;
+
+CREATE TABLE kontroll2(
+id int primary key identity(1,1),
+test varchar(25));
+
+INSERT INTO kontroll2(test)
+
+VALUES('kontroll test');
+
+SELECT * FROM kontroll;
+
+SELECT * FROM kontroll2;
+
+--loome kasutaja LOGIN kaudu
+--määrame SQL käskuga opilane õigused
+--luubamine
+GRANT INSERT ON kontroll TO opilaneIlja;
+
+GRANT DELETE ON kontroll2 TO opilaneIlja;
+
+--keelamine
+DENY UPDATE ON kontroll TO opilaneIlja;
+
+DENY UPDATE ON kontroll2 TO opilaneIlja;
+
+--kasutaja õiguste kontroll
+SELECT * FROM kontroll;
+
+SELECT * FROM kontroll2;
+
+INSERT INTO kontroll(test)
+
+VALUES('kontroll test');
+
+DELETE FROM kontroll2;
+
+UPDATE kontroll set test='uus kontrol';
