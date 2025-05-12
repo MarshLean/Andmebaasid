@@ -305,7 +305,8 @@ VALUES ('test4', 'test4', '2000-01-01', '555-5678');
 
 DENY SELECT ON praktikabaaslogi TO stigmauser;
 GRANT SELECT ON FIRMA TO stigmauser;
-GRANT UPDATE ON praktikabaas TO stigmauser;
+GRANT SELECT, UPDATE ON praktikabaas TO stigmauser;
+GRANT SELECT ON praktikajuhendaja TO stigmauser;
 
 SELECT * FROM praktikajuhendaja;
 --WIP
