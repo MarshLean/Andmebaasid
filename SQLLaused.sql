@@ -117,9 +117,16 @@ DELETE FROM kontroll2;
 
 UPDATE kontroll set test='uus kontrol';
 
-CREATE DATABASE ilyalaused;
 
-USE ilyalaused;
+
+
+
+
+
+
+CREATE DATABASE stigma;
+
+USE stigma;
 
 CREATE TABLE firma (
 firmaID INT NOT NULL PRIMARY KEY IDENTITY(1,1),
@@ -161,11 +168,11 @@ VALUES ('Corbet','Tuminelli','1968-05-19',7118158246),
 ('Sephira','Thayre','1954-09-16',7127249272);
 
 INSERT INTO praktikabaas(firmaID,praktikatingimused,arvutiprogramm,praktikajuhendajaID)
-VALUES (1,' 6 kuud, täistööajaga', 'Microsoft Excel', 3),
-(2,' 3 kuud, osalise tööajaga', 'Adobe Photoshop', 4),
-(3, '1-aastane kestus, täistööajaga', 'AutoCAD', 5),
-(4, '6 kuud kestus, täistööajaga', 'Python', 6),
-(5, '3 kuud, osalise tööajaga', 'JavaScript', 7);
+VALUES (1,' 6 kuud, täistööajaga', 'Microsoft Excel', 1),
+(2,' 3 kuud, osalise tööajaga', 'Adobe Photoshop', 2),
+(3, '1-aastane kestus, täistööajaga', 'AutoCAD', 3),
+(4, '6 kuud kestus, täistööajaga', 'Python', 4),
+(5, '3 kuud, osalise tööajaga', 'JavaScript', 5);
 
 SELECT * FROM firma
 WHERE firmanimi LIKE '%a%'
@@ -197,4 +204,104 @@ ORDER BY PraktikaKogemus DESC;
 
 ALTER TABLE praktikajuhendaja
 ADD palk DECIMAL(10, 2);
+
+CREATE TABLE praktikabaaslogi(
+id INT PRIMARY KEY IDENTITY(1,1),
+kasutaja VARCHAR(25),
+aeg VARCHAR(25),
+tegevus VARCHAR(25),
+andmed VARCHAR(255)
+)
+DROP TABLE praktikabaaslogi;
+--lisamine
+CREATE TRIGGER praktikalog
+
+ON praktikabaas
+
+FOR INSERT
+
+AS
+
+INSERT INTO praktikabaaslogi (kasutaja, aeg, tegevus, andmed)
+
+SELECT
+
+SYSTEM_USER, 
+
+'lisatud',
+
+GETDATE(),
+
+CONCAT (inserted.praktikatingimused, ',' ,inserted.arvutiprogramm)
+
+FROM inserted;
+
+--uuendamine
+CREATE TRIGGER praktikaUuendamine
+
+ON praktikabaas
+
+FOR UPDATE
+
+AS
+
+INSERT INTO praktikabaaslogi(kasutaja, aeg, tegevus, andmed)
+
+SELECT
+
+SYSTEM_USER,
+
+'uuendatud',
+
+GETDATE(),
+
+CONCAT(
+' vana info - ', deleted.praktikatingimused, ',', deleted.arvutiprogramm, 
+' uus info - ', inserted.praktikatingimused, ',', inserted.arvutiprogramm
+)
+
+FROM deleted INNER JOIN inserted
+
+ON deleted.praktikabaasID=inserted.praktikabaasID;
+
+INSERT INTO praktikabaas(praktikatingimused, arvutiprogramm)
+
+VALUES ('test', 'test');
+
+SELECT * FROM praktikabaas;
+
+SELECT * FROM praktikabaaslogi;
+
+UPDATE praktikabaas SET praktikatingimused='test2', arvutiprogramm='test2'
+
+WHERE praktikabaasID=13;
+
+SELECT * FROM praktikabaas;
+
+SELECT * FROM praktikabaaslogi;
+
+CREATE TRIGGER synacleaegcheck
+ON praktikajuhendaja
+INSTEAD OF INSERT
+AS
+BEGIN
+    IF EXISTS (SELECT 1 FROM inserted WHERE synicalaeg > GETDATE())
+    BEGIN
+        RAISERROR('Sünniaeg ei tohi olla tulevikus.', 16, 1);
+    END
+    ELSE
+    BEGIN
+        INSERT INTO praktikajuhendaja (eesnimi, perekonnanimi, synicalaeg, telefon)
+        SELECT eesnimi, perekonnanimi, synicalaeg, telefon
+        FROM inserted;
+    END
+END;
+
+INSERT INTO praktikajuhendaja (eesnimi, perekonnanimi, synicalaeg, telefon)
+VALUES ('test3', 'test3', '2025-12-01', '555-1234');
+
+INSERT INTO praktikajuhendaja (eesnimi, perekonnanimi, synicalaeg, telefon)
+VALUES ('test4', 'test4', '2000-01-01', '555-5678');
+
+SELECT * FROM praktikajuhendaja;
 --WIP
