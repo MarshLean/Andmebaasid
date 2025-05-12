@@ -303,5 +303,9 @@ VALUES ('test3', 'test3', '2025-12-01', '555-1234');
 INSERT INTO praktikajuhendaja (eesnimi, perekonnanimi, synicalaeg, telefon)
 VALUES ('test4', 'test4', '2000-01-01', '555-5678');
 
+DENY SELECT ON praktikabaaslogi TO stigmauser;
+GRANT SELECT ON FIRMA TO stigmauser;
+GRANT UPDATE ON praktikabaas TO stigmauser;
+
 SELECT * FROM praktikajuhendaja;
 --WIP
