@@ -50,7 +50,7 @@ CREATE TABLE logi (
 id INT PRIMARY KEY IDENTITY(1,1),
 kasutaja VARCHAR(100),
 kuupaev DATETIME,
-sisestatudAndmed VARCHAR(100)
+sisestatudAndmed VARCHAR(200)
 );
 
 DROP TABLE Klient;
@@ -63,7 +63,7 @@ SELECT * FROM Toode;
 SELECT * FROM Ost;
 SELECT * FROM logi;
 
-CREATE OR ALTER TRIGGER OstLisamine
+CREATE TRIGGER OstLisamine
 
 ON Ost
 
@@ -105,7 +105,9 @@ SELECT * FROM Ost;
 
 SELECT * FROM logi;
 
+DROP TRIGGER OstUuendamine;
 
+DROP TRIGGER OstLisamine;
 
 CREATE TRIGGER OstUuendamine
 
@@ -177,23 +179,17 @@ SELECT * FROM Toode;
 
 END;
 
+
 BEGIN TRANSACTION;
 
 SAVE TRANSACTION StigmaSave;
 
-BEGIN TRY
-
 INSERT INTO Toode(tootenimi, uhikuhind, uhik) VALUES ('Leib', 0.8, 'tk');
+
+SELECT * FROM Toode;
 
 COMMIT;
 
-END TRY
-
-BEGIN CATCH
-
-ROLLBACK;
-
-END CATCH;
 
 
 BEGIN TRANSACTION;
