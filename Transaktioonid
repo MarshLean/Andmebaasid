@@ -205,3 +205,16 @@ DELETE FROM Toode WHERE id=7;
 ROLLBACK TRANSACTION StigmaSave;
 
 SELECT * FROM Toode;
+
+
+--user
+SELECT * FROM Klient;
+
+INSERT INTO Klient (eesnimi, perenimi) VALUES
+('M', 'T')
+
+ALTER TABLE Klient DROP COLUMN perenimi;
+
+CREATE TABLE Stigma (
+id INT
+);
