@@ -1,0 +1,211 @@
+CREATE DATABASE iljatoo;
+
+USE iljatoo;
+
+CREATE TABLE Klient (
+id INT PRIMARY KEY IDENTITY(1,1),
+eesnimi VARCHAR(50),
+perenimi VARCHAR(50)
+);
+
+CREATE TABLE Ost (
+id INT PRIMARY KEY IDENTITY(1,1),
+kliendi_id INT,
+toote_id INT,
+FOREIGN KEY(kliendi_id) REFERENCES Klient(id),
+FOREIGN KEY(toote_id) REFERENCES Toode(id)
+);
+
+CREATE TABLE Toode (
+id INT PRIMARY KEY IDENTITY(1,1),
+tootenimi VARCHAR(100),
+uhikuhind NUMERIC,
+uhik VARCHAR(2)
+);
+
+INSERT INTO Klient (eesnimi, perenimi) VALUES
+('Mari', 'Tamm'),
+('Jüri', 'Kask'),
+('Liis', 'Mägi'),
+('Peeter', 'Rebane'),
+('Anna', 'Sepp');
+
+INSERT INTO Toode (tootenimi, uhikuhind, uhik) VALUES
+('Piim', 1.20, 'l'),
+('Leib', 0.80, 'tk'),
+('Õun', 0.50, 'kg'),
+('Või', 2.50, 'tk'),
+('Kohv', 3.00, 'kg');
+
+INSERT INTO Ost (kliendi_id, toote_id) VALUES
+(1, 2),
+(3, 1),
+(2, 3);
+
+GRANT SELECT, INSERT ON Klient TO opilaneIlja;
+GRANT SELECT, INSERT ON Toode TO opilaneIlja;
+GRANT SELECT, INSERT ON Ost TO opilaneIlja;
+
+CREATE TABLE logi (
+id INT PRIMARY KEY IDENTITY(1,1),
+kasutaja VARCHAR(100),
+kuupaev DATETIME,
+sisestatudAndmed VARCHAR(100)
+);
+
+DROP TABLE Klient;
+DROP TABLE Toode;
+DROP TABLE Ost;
+DROP TABLE logi;
+
+SELECT * FROM Klient;
+SELECT * FROM Toode;
+SELECT * FROM Ost;
+SELECT * FROM logi;
+
+CREATE OR ALTER TRIGGER OstLisamine
+
+ON Ost
+
+FOR INSERT
+
+AS
+
+BEGIN
+
+INSERT INTO logi (kasutaja, kuupaev, sisestatudAndmed)
+
+SELECT 
+
+SYSTEM_USER,
+
+GETDATE(),
+
+CONCAT(
+
+'Lisatud ost - kliendi_id=', i.kliendi_id,
+', toote_id=', i.toote_id,
+', klient: ', k.eesnimi, ' ', k.perenimi,
+', toode: ', t.tootenimi, ' (', CAST(t.uhikuhind AS VARCHAR(20)), ' ', t.uhik, ')'
+)
+
+FROM inserted i
+
+JOIN Klient k ON i.kliendi_id = k.id
+
+JOIN Toode t ON i.toote_id = t.id;
+
+END;
+
+UPDATE Ost SET kliendi_id=5
+
+WHERE toote_id=2;
+
+SELECT * FROM Ost;
+
+SELECT * FROM logi;
+
+
+
+CREATE TRIGGER OstUuendamine
+
+ON Ost
+
+FOR UPDATE
+
+AS
+
+BEGIN
+
+INSERT INTO logi (kasutaja, kuupaev, sisestatudAndmed)
+
+SELECT 
+
+SYSTEM_USER,
+
+GETDATE(),
+
+CONCAT(
+
+'Uuendatud ost - vana: kliendi_id=', d.kliendi_id, ', toote_id=', d.toote_id,
+', klient: ', k1.eesnimi, ' ', k1.perenimi,
+', toode: ', t1.tootenimi, ' (', CAST(t1.uhikuhind AS VARCHAR(20)), ' ', t1.uhik, ')',
+' | uus: kliendi_id=', i.kliendi_id, ', toote_id=', i.toote_id,
+', klient: ', k2.eesnimi, ' ', k2.perenimi,
+', toode: ', t2.tootenimi, ' (', CAST(t2.uhikuhind AS VARCHAR(20)), ' ', t2.uhik, ')'
+)
+
+FROM deleted d
+
+JOIN inserted i ON d.id = i.id
+
+JOIN Klient k1 ON d.kliendi_id = k1.id
+
+JOIN Toode t1 ON d.toote_id = t1.id
+
+JOIN Klient k2 ON i.kliendi_id = k2.id
+
+JOIN Toode t2 ON i.toote_id = t2.id;
+
+END;
+
+INSERT INTO Ost(kliendi_id, toote_id)
+
+VALUES (5, 5);
+
+SELECT * FROM Ost;
+
+SELECT * FROM logi;
+
+DENY ALTER, CREATE TABLE TO opilaneIlja;
+
+CREATE PROCEDURE lisaToode
+@id INT,
+@tootenimi varchar(100),
+@uhikuhind NUMERIC,
+@uhik varchar(2)
+
+AS
+
+BEGIN
+
+INSERT INTO Toode(id, tootenimi, uhikuhind, uhik)
+
+VALUES (@id, @tootenimi, @uhikuhind, @uhik);
+
+SELECT * FROM Toode;
+
+END;
+
+BEGIN TRANSACTION;
+
+SAVE TRANSACTION StigmaSave;
+
+BEGIN TRY
+
+INSERT INTO Toode(tootenimi, uhikuhind, uhik) VALUES ('Leib', 0.8, 'tk');
+
+COMMIT;
+
+END TRY
+
+BEGIN CATCH
+
+ROLLBACK;
+
+END CATCH;
+
+
+BEGIN TRANSACTION;
+
+SELECT * FROM Toode;
+
+INSERT INTO Toode(tootenimi, uhikuhind, uhik) VALUES ('Juust', 1.4, 'kg');
+
+SAVE TRANSACTION StigmaSave;
+
+DELETE FROM Toode WHERE id=7;
+
+ROLLBACK TRANSACTION StigmaSave;
+
+SELECT * FROM Toode;
